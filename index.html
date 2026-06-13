@@ -118,7 +118,7 @@ var f=filtered();
 if(f.length===0){eFil.style.display="flex";eMsg.textContent=filter==="active"?"??????????":"??????????";fb.style.display="flex";return}
 fb.style.display="flex";
 var rem=0;for(var i=0;i<todos.length;i++){if(!todos[i].completed)rem++}
-cd.textContent=rem+" ????";
+cd.textContent=rem+" 项待完成";
 ccb.style.display=rem<todos.length?"inline-block":"none";
 for(var i=0;i<f.length;i++){var t=f[i],li=document.createElement("li");li.className="item"+(t.completed? "completed":"");li.setAttribute("data-id",t.id);
 var cbd=document.createElement("div");cbd.className="item-cb";
