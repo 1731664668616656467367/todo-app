@@ -2,7 +2,7 @@
   "name": "待办事项清单",
   "short_name": "待办事项",
   "description": "简洁的待办事项管理工具",
-  "start_url": "/",
+  "start_url": "/todo-app/",
  "display": "standalone",
   "background_color": "#f1f5f9",
   "theme_color": "#6366f1",
