@@ -114,7 +114,7 @@ var list=document.getElementById("todoList"),eAll=document.getElementById("empty
 list.innerHTML="";eAll.style.display="none";eFil.style.display="none";
 if(todos.length===0){eAll.style.display="flex";fb.style.display="none";return}
 var f=filtered();
-if(f.length===0){eFil.style.display="flex";eMsg.textContent="无"fb.style.display="flex";return}
+if(f.length===0){eFil.style.display="flex";eMsg.textContent="无";fb.style.display="flex";return}
 fb.style.display="flex";
 var rem=0;for(var i=0;i<todos.length;i++){if(!todos[i].completed)rem++}
 cd.textContent=rem+" 项待完成";
