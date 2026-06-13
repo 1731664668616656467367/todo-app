@@ -32,7 +32,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .date-input{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;background:var(--bg);color:var(--primary);accent-color:var(--primary);flex-shrink:0;max-width:160px}
 .date-input:focus{border-color:var(--primary)}.date-input::-webkit-calendar-picker-indicator{filter:hue-rotate(300deg)}
 #todoList{list-style:none;margin:0;padding:0}
-.item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.item{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
 .item:last-child{border-bottom:none}
 .item.completed .item-text{color:var(--completed);text-decoration:line-through}
 .item-cb{position:relative;width:22px;height:22px;flex-shrink:0}
@@ -114,7 +114,7 @@ var list=document.getElementById("todoList"),eAll=document.getElementById("empty
 list.innerHTML="";eAll.style.display="none";eFil.style.display="none";
 if(todos.length===0){eAll.style.display="flex";fb.style.display="none";return}
 var f=filtered();
-if(f.length===0){eFil.style.display="flex";eMsg.textContent=filter==="active"?"??????????":"??????????";fb.style.display="flex";return}
+if(f.length===0){eFil.style.display="flex";eMsg.textContent="无"fb.style.display="flex";return}
 fb.style.display="flex";
 var rem=0;for(var i=0;i<todos.length;i++){if(!todos[i].completed)rem++}
 cd.textContent=rem+" 项待完成";
