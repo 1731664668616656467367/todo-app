@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#6366f1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="待办事项">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>待办事项清单</title>
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#6366f1;--primary-hover:#4f46e5;--primary-light:#eef2ff;--bg:#f1f5f9;--surface:#fff;--text:#1e293b;--text-secondary:#64748b;--text-tertiary:#94a3b8;--border:#e2e8f0;--completed:#94a3b8;--danger:#ef4444;--danger-hover:#dc2626;--shadow:0 4px 12px rgba(0,0,0,0.08);--radius:12px;--radius-sm:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:40px 20px}
+#app{width:100%;max-width:580px}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--text)}
+.header p{font-size:14px;color:var(--text-secondary);margin-top:4px}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.input-row{display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.input-row input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+.input-row input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,0.15)}
+.input-row button{padding:10px 20px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.input-row button:hover{background:var(--primary-hover)}
+.input-row button:disabled{opacity:.5;cursor:not-allowed}
+#todoList{list-style:none;margin:0;padding:0}
+.item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:none}
+.item.completed .item-text{color:var(--completed);text-decoration:line-through}
+.item-cb{position:relative;width:22px;height:22px;flex-shrink:0}
+.item-cb input{position:absolute;opacity:0;width:0;height:0}
+.item-cb label{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:2px solid var(--border);border-radius:50%;cursor:pointer;transition:all .15s;color:transparent}
+.item-cb input:checked+label{background:var(--primary);border-color:var(--primary);color:#fff}
+.item-cb label:hover{border-color:var(--primary)}
+.item-text{flex:1;font-size:15px;cursor:pointer;word-break:break-word;padding:4px 0;user-select:none}
+.item-text.editing{outline:none;border-bottom:2px solid var(--primary);background:var(--primary-light);border-radius:4px;padding:2px 6px;cursor:text;user-select:text}
+.del-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;color:var(--text-tertiary);border-radius:var(--radius-sm);cursor:pointer;flex-shrink:0;opacity:0;transition:all .15s}
+.item:hover .del-btn{opacity:1}
+.del-btn:hover{background:#fef2f2;color:var(--danger)}
+.footer{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#fafafc;border-top:1px solid var(--border);flex-wrap:wrap}
+.count{font-size:13px;color:var(--text-secondary);margin-right:auto}
+.filters{display:flex;gap:4px}
+.filter-btn{padding:4px 12px;border:1px solid transparent;border-radius:20px;background:transparent;color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.filter-btn:hover{color:var(--text);background:var(--border)}
+.filter-btn.active{color:var(--primary);background:var(--primary-light);border-color:var(--primary)}
+.clear-btn{padding:4px 12px;border:none;border-radius:20px;background:transparent;color:var(--text-tertiary);font-size:13px;cursor:pointer;transition:all .15s}
+.clear-btn:hover{color:var(--danger);background:#fef2f2}
+.empty-state{display:flex;flex-direction:column;align-items:center;padding:60px 20px;text-align:center}
+.empty-state p{font-size:16px;color:var(--text-secondary);font-weight:500;margin-top:16px}
+.empty-state span{font-size:13px;color:var(--text-tertiary);margin-top:4px}
+@media(max-width:480px){body{padding:20px 12px}.header h1{font-size:24px}.input-row{flex-direction:column;padding:12px 16px}.item{padding:12px 16px}.footer{flex-direction:column;align-items:stretch;gap:8px}.count{text-align:center;margin-right:0}.filters{justify-content:center}.clear-btn{text-align:center}.del-btn{opacity:1}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+<h1>待办事项</h1>
+<p>保持条理，完成更多</p>
+</div>
+<div class="card">
+<div class="input-row">
+<input id="todoInput" type="text" placeholder="添加新的待办事项..." autofocus>
+<button id="addBtn" disabled>＋ 添加</button>
+</div>
+<ul id="todoList"></ul>
+<div id="emptyAll" class="empty-state" style="display:none">
+<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#cbd5e1" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+<p>还没有待办事项</p>
+<span>在上面输入内容开始添加</span>
+</div>
+<div id="emptyFilter" class="empty-state" style="display:none">
+<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#cbd5e1" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+<p id="emptyFilterMsg">没有进行中的待办事项</p>
+</div>
+<div id="footerBar" class="footer" style="display:none">
+<span class="count" id="countDisplay">0 项待完成</span>
+<div class="filters">
+<button class="filter-btn active" data-f="all">全部</button>
+<button class="filter-btn" data-f="active">进行中</button>
+<button class="filter-btn" data-f="completed">已完成</button>
+</div>
+<button id="clearCompletedBtn" class="clear-btn" style="display:none">清除已完成</button>
+</div>
+</div>
+</div>
+<script>
+(function(){
+var KEY='todo_items_v3',todos=[],filter='all';
+function load(){try{var d=localStorage.getItem(KEY);todos=d?JSON.parse(d):[]}catch(e){todos=[]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(todos))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function add(s){if(!s.trim())return;todos.unshift({id:uid(),text:s.trim(),completed:false});save();render()}
+function toggle(id){for(var i=0;i<todos.length;i++){if(todos[i].id===id){todos[i].completed=!todos[i].completed;break}}save();render()}
+function del(id){for(var i=0;i<todos.length;i++){if(todos[i].id===id){todos.splice(i,1);break}}save();render()}
+function edit(id,text){if(!text.trim()){del(id);return}for(var i=0;i<todos.length;i++){if(todos[i].id===id){todos[i].text=text.trim();break}}save();render()}
+function clearC(){todos=todos.filter(function(t){return!t.completed});save();render()}
+function filtered(){if(filter==='active')return todos.filter(function(t){return!t.completed});if(filter==='completed')return todos.filter(function(t){return t.completed});return todos}
+function escapeHTML(str){var d=document.createElement('div');d.textContent=str;return d.innerHTML}
+function render(){
+var list=document.getElementById('todoList'),eAll=document.getElementById('emptyAll'),eFil=document.getElementById('emptyFilter'),eMsg=document.getElementById('emptyFilterMsg'),fb=document.getElementById('footerBar'),cd=document.getElementById('countDisplay'),ccb=document.getElementById('clearCompletedBtn');
+list.innerHTML='';
+if(todos.length===0){eAll.style.display='flex';eFil.style.display='none';fb.style.display='none';return}
+eAll.style.display='none';
+var f=filtered();
+if(f.length===0){eFil.style.display='flex';eMsg.textContent=filter==='active'?'没有进行中的待办事项':'没有已完成的待办事项';fb.style.display='flex';return}
+eFil.style.display='none';fb.style.display='flex';
+var rem=0;for(var i=0;i<todos.length;i++){if(!todos[i].completed)rem++}
+cd.textContent=rem+' 项待完成';
+ccb.style.display=(rem<todos.length)?'inline-block':'none';
+for(var i=0;i<f.length;i++){
+var t=f[i],li=document.createElement('li');
+li.className='item'+(t.completed?' completed':'');
+li.setAttribute('data-id',t.id);
+var cbDiv=document.createElement('div');cbDiv.className='item-cb';
+var cb=document.createElement('input');cb.type='checkbox';cb.id='c'+t.id;
+if(t.completed)cb.checked=true;
+var lbl=document.createElement('label');lbl.htmlFor='c'+t.id;
+lbl.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+cbDiv.appendChild(cb);cbDiv.appendChild(lbl);
+var span=document.createElement('span');span.className='item-text';span.textContent=t.text;
+span.addEventListener('dblclick',function(e){
+var s=e.target;if(s.contentEditable==='true')return;
+s.contentEditable='true';s.className='item-text editing';
+var r=document.createRange();r.selectNodeContents(s);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+});
+span.addEventListener('blur',function(e){
+var s=e.target;s.contentEditable='false';s.className='item-text';
+var id=s.parentNode.getAttribute('data-id');edit(id,s.textContent);
+});
+span.addEventListener('keydown',function(e){
+if(e.key==='Enter'){e.preventDefault();e.target.blur()}
+if(e.key==='Escape'){e.preventDefault();var s=e.target,id=s.parentNode.getAttribute('data-id');for(var j=0;j<todos.length;j++){if(todos[j].id===id){s.textContent=todos[j].text;break}}s.blur()}
+});
+var dbtn=document.createElement('button');dbtn.className='del-btn';dbtn.title='删除';
+dbtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+li.appendChild(cbDiv);li.appendChild(span);li.appendChild(dbtn);
+list.appendChild(li);
+cb.addEventListener('change',(function(id){return function(){toggle(id)}})(t.id));
+dbtn.addEventListener('click',(function(id){return function(){del(id)}})(t.id));
+}
+}
+load();render();
+var inp=document.getElementById('todoInput'),abtn=document.getElementById('addBtn');
+inp.addEventListener('input',function(){abtn.disabled=!inp.value.trim()});
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&inp.value.trim()){add(inp.value);inp.value='';abtn.disabled=true;inp.focus()}});
+abtn.addEventListener('click',function(){add(inp.value);inp.value='';abtn.disabled=true;inp.focus()});
+var fltrs=document.querySelectorAll('.filter-btn');
+for(var i=0;i<fltrs.length;i++){fltrs[i].addEventListener('click',function(){
+for(var j=0;j<fltrs.length;j++)fltrs[j].classList.remove('active');
+this.classList.add('active');filter=this.getAttribute('data-f');render()
+})}
+document.getElementById('clearCompletedBtn').addEventListener('click',clearC);
+})();
+</script>
+</body>
+</html>
