@@ -159,8 +159,8 @@ dbtn.addEventListener('click',(function(id){return function(){del(id)}})(t.id));
 load();render();
 var inp=document.getElementById('todoInput'),abtn=document.getElementById('addBtn');var si=document.getElementById('searchInput');if(si){si.addEventListener('input',function(){searchQuery=si.value;render()})};
 inp.addEventListener('input',function(){abtn.disabled=!inp.value.trim()});
-inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&inp.value.trim()){add(inp.value,(dd?dd.value:''));inp.value='';dd.value='';abtn.disabled=true;inp.focus()}});
-var dd=document.getElementById('dueDateInput');abtn.addEventListener('click',function(){add(inp.value,dd.value);inp.value='';dd.value='';abtn.disabled=true;inp.focus()});
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&inp.value.trim()){add(inp.value,(dd?dd.value:''));inp.value='';if(dd)dd.value='';abtn.disabled=true;inp.focus()}});
+var dd=document.getElementById('dueDateInput');abtn.addEventListener('click',function(){add(inp.value,(dd?dd.value:'');inp.value='';if(dd)dd.value='';abtn.disabled=true;inp.focus()});
 var fltrs=document.querySelectorAll('.filter-btn');
 for(var i=0;i<fltrs.length;i++){fltrs[i].addEventListener('click',function(){
 for(var j=0;j<fltrs.length;j++)fltrs[j].classList.remove('active');
