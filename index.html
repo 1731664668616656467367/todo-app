@@ -153,7 +153,7 @@ for(var j=0;j<fltrs.length;j++)fltrs[j].classList.remove('active');
 this.classList.add('active');filter=this.getAttribute('data-f');render()
 })}
 document.getElementById('clearCompletedBtn').addEventListener('click',clearC);
-})();
+})();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>
